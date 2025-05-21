@@ -26,13 +26,14 @@ class EmployeeService {
         return this.employeeRepository.create(newEmployee)
     }
 
-    async updateEmployee(id:number, email:string, name:string): Promise<void> {
+    async updateEmployee(id:number, email:string, name:string,age:number): Promise<void> {
         const existingEmployee = await this.employeeRepository.findOneById(id)
 
         if(existingEmployee){
             const employee = new Employee();
             employee.name=name;
             employee.email=email;
+            employee.age=age;
             await this.employeeRepository.update(id,employee)
         }
     }

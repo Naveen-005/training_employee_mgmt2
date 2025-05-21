@@ -6,6 +6,7 @@ import { CreateEmployeeDto } from "../dto/create-employee.dto";
 import { CreateAddressDto } from "../dto/create-address.dto";
 import { plainToInstance, } from "class-transformer";
 import { validate } from "class-validator";
+import { UpdateEmployeeDto } from "../dto/update-employee.dto";
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
@@ -59,13 +60,30 @@ class EmployeeController {
             
     }
 
-    updateEmployee = async (req:Request, res:Response)=> {
-        const id=Number(req.params.id)
-        const email= req.body.email
-        const name=req.body.name
+    updateEmployee = async (req:Request, res:Response, next:NextFunction)=> {
 
-        await this.employeeService.updateEmployee(id,email,name)
-        res.status(204).send();
+        try{
+            const id=Number(req.params.id)
+            const email= req.body.email
+            const name=req.body.name
+
+            const updateEmployeeDto = plainToInstance(UpdateEmployeeDto, req.body);
+            const errors = await validate(updateEmployeeDto,{skipMissingProperties:true});
+
+            if (errors.length > 0) {
+                console.log(JSON.stringify(errors));
+                throw new HttpException(400, JSON.stringify(errors));
+            }
+
+
+
+            await this.employeeService.updateEmployee(id,updateEmployeeDto.email,updateEmployeeDto.name,updateEmployeeDto.age)
+            res.status(204).send();
+
+        }catch (error) {
+            next(error);
+        }
+        
     }
 
     deleteEmployee = async (req:Request, res:Response)=> {
