@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
-import employeeRouter from "./employee_router";
 import loggerMiddleware from "./loggerMiddleware";
 import { processTimeMiddleware } from "./processTimeMiddleware";
-import dataSource from "./data-source";
+import dataSource from "./db/data-source";
+import employeeRouter from "./routes/employee.route";
 
 
 const server = express();
