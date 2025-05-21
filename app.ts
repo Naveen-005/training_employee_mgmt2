@@ -3,6 +3,7 @@ import loggerMiddleware from "./loggerMiddleware";
 import { processTimeMiddleware } from "./processTimeMiddleware";
 import dataSource from "./db/data-source";
 import employeeRouter from "./routes/employee.route";
+import { errorMiddleware } from "./errorMiddleware";
 
 
 const server = express();
@@ -10,11 +11,14 @@ server.use(express.json());
 server.use(loggerMiddleware);
 server.use(processTimeMiddleware);
 
+
+
 server.get("/", (req: Request, res: Response) => {
   res.status(200).send("Hello world");
 });
 
 server.use("/employees", employeeRouter);
+server.use(errorMiddleware);
 
 (async()=>{
   try{

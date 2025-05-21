@@ -1,5 +1,11 @@
+import HttpException from "../exception/httpException";
 import EmployeeService from "../services/employee.service";
-import {Request, Response, Router} from "express";
+import {Request, Response, Router, NextFunction} from "express";
+import { isEmail } from "../validators/emailValidator";
+import { CreateEmployeeDto } from "../dto/create-employee.dto";
+import { CreateAddressDto } from "../dto/create-address.dto";
+import { plainToInstance, } from "class-transformer";
+import { validate } from "class-validator";
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
@@ -10,11 +16,26 @@ class EmployeeController {
         router.delete("/:id",this.deleteEmployee);
     }
 
-    async createEmployee(req:Request, res: Response){
-        const email=req.body.email;
-        const name=req.body.name;
-        const savedEmployee = await this.employeeService.createEmployee(email, name);
-        res.status(201).send(savedEmployee)
+    async createEmployee(req:Request, res: Response, next:NextFunction){
+
+        try {
+            const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body);
+            const errors = await validate(createEmployeeDto);
+            if (errors.length > 0) {
+                console.log(JSON.stringify(errors));
+                throw new HttpException(400, JSON.stringify(errors));
+            }
+            const savedEmployee = await this.employeeService.createEmployee(
+                createEmployeeDto.email,
+                createEmployeeDto.name,
+                createEmployeeDto.age,
+                createEmployeeDto.address
+            );
+            res.status(201).send(savedEmployee);
+        } catch (error) {
+            next(error);
+        }
+        
     }
 
     async getAllEmployees(req:Request, res:Response){
@@ -22,10 +43,20 @@ class EmployeeController {
         res.status(200).send(employees);
     }
 
-    async getEmployeeById(req:Request, res:Response){
-        const id=Number(req.params.id)
-        const employee=await this.employeeService.getEmployeeByID(id)
-        res.status(200).send(employee)
+    async getEmployeeById(req:Request, res:Response, next: NextFunction){
+
+        try{
+            const id=Number(req.params.id)
+            const employee=await this.employeeService.getEmployeeByID(id)
+            if (!employee){
+                throw new HttpException(404,'employee not found')
+            }
+            res.status(200).send(employee)
+        } catch(err){
+            console.log(err)
+            next(err);
+        }
+            
     }
 
     updateEmployee = async (req:Request, res:Response)=> {
@@ -43,6 +74,8 @@ class EmployeeController {
         await this.employeeService.deleteEmployee(id)
         res.status(200).send();
     }
+
+
 
 }
 

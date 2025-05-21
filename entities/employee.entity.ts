@@ -1,9 +1,10 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne} from "typeorm";
+import AbstractEntity from "./abstract.entity";
+import Address from "./address.entity";
+import { CreateAddressDto } from "../dto/create-address.dto";
 
 @Entity()
-class Employee {
-    @PrimaryGeneratedColumn()
-    id: number;
+class Employee extends AbstractEntity {
 
     @Column({unique:true})
     email: string;
@@ -11,11 +12,15 @@ class Employee {
     @Column()
     name: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @Column()
+    age: number;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+    @OneToOne(()=>Address,(address)=> address.employee,{
+      cascade: true,
+      onDelete: 'CASCADE'
+    })
+    @JoinColumn()
+    address: Address
   }
   
   export default Employee;
