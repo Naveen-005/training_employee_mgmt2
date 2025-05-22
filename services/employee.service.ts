@@ -3,6 +3,7 @@ import Employee, { EmployeeRole } from '../entities/employee.entity';
 import Address from '../entities/address.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import bcrypt from 'bcrypt'
+import HttpException from '../exception/httpException';
 
 class EmployeeService {
     constructor(private employeeRepository: EmployeeRepository){}
@@ -12,7 +13,11 @@ class EmployeeService {
     }
 
     async getEmployeeByID(id:number): Promise<Employee> {
-        return this.employeeRepository.findOneById(id)
+        let employee= await this.employeeRepository.findOneById(id)
+        if(!employee){
+            throw new Error("Employee not found");
+        }
+        return employee;
     }
 
     async getEmployeeByEmail(email:string):Promise<Employee> {
