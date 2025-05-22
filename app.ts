@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
-import loggerMiddleware from "./loggerMiddleware";
-import { processTimeMiddleware } from "./processTimeMiddleware";
+import loggerMiddleware from "./middlewares/loggerMiddleware";
+import { processTimeMiddleware } from "./middlewares/processTimeMiddleware";
 import dataSource from "./db/data-source";
 import employeeRouter from "./routes/employee.route";
-import { errorMiddleware } from "./errorMiddleware";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
 import {authRouter} from "./routes/auth.route"
-import { authMiddleware } from "./authMiddleware";
-
+import { authMiddleware } from "./middlewares/authMiddleware";
 
 const server = express();
 server.use(express.json());

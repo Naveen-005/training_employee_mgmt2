@@ -21,7 +21,8 @@ export class AuthService {
         }
         const payload:JwtPayload={
             id:employee.id,
-            email:employee.email
+            email:employee.email,
+            role:employee.role
         }
         const token = jwt.sign(payload,JWT_SECRET,{expiresIn: JWT_VALIDITY});
         return{

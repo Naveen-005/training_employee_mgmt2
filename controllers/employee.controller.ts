@@ -1,20 +1,19 @@
 import HttpException from "../exception/httpException";
 import EmployeeService from "../services/employee.service";
 import {Request, Response, Router, NextFunction} from "express";
-import { isEmail } from "../validators/emailValidator";
 import { CreateEmployeeDto } from "../dto/create-employee.dto";
-import { CreateAddressDto } from "../dto/create-address.dto";
 import { plainToInstance, } from "class-transformer";
 import { validate } from "class-validator";
 import { UpdateEmployeeDto } from "../dto/update-employee.dto";
+import { authorizationMiddleware } from "../middlewares/authorizationMiddleware";
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
-        router.post("/",this.createEmployee.bind(this));
+        router.post("/",authorizationMiddleware,this.createEmployee.bind(this));
         router.get("/:id",this.getEmployeeById.bind(this));
         router.get("/",this.getAllEmployees.bind(this));
-        router.put("/:id",this.updateEmployee);
-        router.delete("/:id",this.deleteEmployee);
+        router.put("/:id",authorizationMiddleware,this.updateEmployee);
+        router.delete("/:id",authorizationMiddleware,this.deleteEmployee);
     }
 
     async createEmployee(req:Request, res: Response, next:NextFunction){
@@ -31,7 +30,8 @@ class EmployeeController {
                 createEmployeeDto.name,
                 createEmployeeDto.age,
                 createEmployeeDto.address,
-                createEmployeeDto.password
+                createEmployeeDto.password,
+                createEmployeeDto.role
             );
             res.status(201).send(savedEmployee);
         } catch (error) {

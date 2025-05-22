@@ -4,6 +4,13 @@ import Address from "./address.entity";
 import { CreateAddressDto } from "../dto/create-address.dto";
 import Department from "./department.entity";
 
+export enum EmployeeRole{
+    UI='UI',
+    UX='UX',
+    DEVELOPER='DEVELOPER',
+    HR='HR'
+}
+
 @Entity()
 class Employee extends AbstractEntity {
 
@@ -19,6 +26,13 @@ class Employee extends AbstractEntity {
     @Column()
     password: string;
 
+    @Column({
+      type:'enum',
+      enum:EmployeeRole,
+      default: EmployeeRole.DEVELOPER
+    })
+    role: EmployeeRole;
+
     @OneToOne(()=>Address,(address)=> address.employee,{
       cascade: true,
       onDelete: 'CASCADE'
@@ -29,6 +43,8 @@ class Employee extends AbstractEntity {
     @ManyToOne(() => Department, (department) => department.employees)
     department:Department
   }
+
+
   
   export default Employee;
   

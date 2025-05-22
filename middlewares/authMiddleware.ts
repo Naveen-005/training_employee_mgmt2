@@ -1,15 +1,15 @@
 import{Request, Response, NextFunction} from 'express'
-import HttpException from './exception/httpException';
+import HttpException from '../exception/httpException';
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from './utils/constants';
-import { JwtPayload } from "./dto/jwt-payload";
+import { JWT_SECRET } from '../utils/constants';
+import { JwtPayload } from "../dto/jwt-payload";
 
 
 export const authMiddleware=(req:Request, res:Response, next:NextFunction)=>{
     
     const token=getToken(req);
     if(!token){
-        throw new HttpException(401,"Not authorized")
+        throw new HttpException(401,"Not authenticated")
     }
     try{
         const payload=jwt.verify(token,JWT_SECRET) as JwtPayload
