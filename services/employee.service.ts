@@ -2,6 +2,7 @@ import EmployeeRepository from '../repositories/employee.repository'
 import Employee from '../entities/employee.entity';
 import Address from '../entities/address.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
+import bcrypt from 'bcrypt'
 
 class EmployeeService {
     constructor(private employeeRepository: EmployeeRepository){}
@@ -14,7 +15,11 @@ class EmployeeService {
         return this.employeeRepository.findOneById(id)
     }
 
-    async createEmployee(email:string, name:string, age:number, address:CreateAddressDto): Promise<Employee> {
+    async getEmployeeByEmail(email:string):Promise<Employee> {
+        return this.employeeRepository.findByEmail(email)
+    }
+
+    async createEmployee(email:string, name:string, age:number, address:CreateAddressDto, password:string): Promise<Employee> {
         const newEmployee = new Employee();
         newEmployee.email=email
         newEmployee.name=name
@@ -22,6 +27,7 @@ class EmployeeService {
         newEmployee.address=new Address()
         newEmployee.address.line1=address.line1,
         newEmployee.address.pincode=address.pincode
+        newEmployee.password= await bcrypt.hash(password,10)
         
         return this.employeeRepository.create(newEmployee)
     }

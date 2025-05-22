@@ -4,6 +4,8 @@ import { processTimeMiddleware } from "./processTimeMiddleware";
 import dataSource from "./db/data-source";
 import employeeRouter from "./routes/employee.route";
 import { errorMiddleware } from "./errorMiddleware";
+import {authRouter} from "./routes/auth.route"
+import { authMiddleware } from "./authMiddleware";
 
 
 const server = express();
@@ -17,7 +19,9 @@ server.get("/", (req: Request, res: Response) => {
   res.status(200).send("Hello world");
 });
 
-server.use("/employees", employeeRouter);
+server.use("/employees",authMiddleware,employeeRouter);
+server.use("/auth",authRouter);
+
 server.use(errorMiddleware);
 
 (async()=>{

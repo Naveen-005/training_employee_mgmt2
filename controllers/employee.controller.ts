@@ -30,7 +30,8 @@ class EmployeeController {
                 createEmployeeDto.email,
                 createEmployeeDto.name,
                 createEmployeeDto.age,
-                createEmployeeDto.address
+                createEmployeeDto.address,
+                createEmployeeDto.password
             );
             res.status(201).send(savedEmployee);
         } catch (error) {
@@ -41,6 +42,7 @@ class EmployeeController {
 
     async getAllEmployees(req:Request, res:Response){
         const employees=await this.employeeService.getAllEmployees();
+        console.log("req.user="+req.user)
         res.status(200).send(employees);
     }
 

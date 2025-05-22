@@ -16,6 +16,9 @@ class Employee extends AbstractEntity {
     @Column()
     age: number;
 
+    @Column()
+    password: string;
+
     @OneToOne(()=>Address,(address)=> address.employee,{
       cascade: true,
       onDelete: 'CASCADE'
