@@ -3,12 +3,13 @@ import Employee, { EmployeeRole } from '../entities/employee.entity';
 import Address from '../entities/address.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import bcrypt from 'bcrypt'
-import HttpException from '../exception/httpException';
 
 class EmployeeService {
+
     constructor(private employeeRepository: EmployeeRepository){}
 
     async getAllEmployees(): Promise<Employee[]> {
+
         return this.employeeRepository.findMany();
     }
 
