@@ -75,7 +75,7 @@ class EmployeeController {
             }
 
 
-            await this.employeeService.updateEmployee(id,updateEmployeeDto.email,updateEmployeeDto.name,updateEmployeeDto.age)
+            await this.employeeService.updateEmployee(id,updateEmployeeDto)
             res.status(201).send();
 
         }catch (error) {

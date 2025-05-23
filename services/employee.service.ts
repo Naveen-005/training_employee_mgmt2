@@ -5,6 +5,8 @@ import { CreateAddressDto } from '../dto/create-address.dto';
 import bcrypt from 'bcrypt'
 import { CreateEmployeeDto } from '../dto/create-employee.dto';
 import DepartmentRepository from '../repositories/department.repository';
+import { UpdateEmployeeDto } from '../dto/update-employee.dto';
+import HttpException from '../exception/httpException';
 
 class EmployeeService {
 
@@ -51,15 +53,32 @@ class EmployeeService {
         return this.employeeRepository.create(newEmployee)
     }
 
-    async updateEmployee(id:number, email:string, name:string,age:number): Promise<void> {
+    async updateEmployee(id:number, updatedEmployee:UpdateEmployeeDto): Promise<void> {
         const existingEmployee = await this.employeeRepository.findOneById(id)
 
-        if(existingEmployee){
-            const employee = new Employee();
-            employee.name=name;
-            employee.email=email;
-            employee.age=age;
-            await this.employeeRepository.update(id,employee)
+        if(!existingEmployee){
+            throw new HttpException(404,"Employee does not exist")
+        }
+        else{
+            // const employee = new Employee();
+            // employee.address = new Address();
+            existingEmployee.email= updatedEmployee.email
+            existingEmployee.employeeId= updatedEmployee.employeeId
+            existingEmployee.name= updatedEmployee.name
+            existingEmployee.age= updatedEmployee.age
+            existingEmployee.password= await bcrypt.hash(updatedEmployee.password,10)
+            existingEmployee.role= updatedEmployee.role
+            existingEmployee.dateOfJoining = updatedEmployee.dateOfJoining
+            existingEmployee.experience = updatedEmployee.experience
+            existingEmployee.status = updatedEmployee.status
+
+            existingEmployee.address.line1=updatedEmployee.address.line1
+            existingEmployee.address.line2=updatedEmployee.address.line2
+            existingEmployee.address.houseNo=updatedEmployee.address.houseNo
+            existingEmployee.address.pincode=updatedEmployee.address.pincode
+            existingEmployee.department= await this.departmentRepository.findOneById(updatedEmployee.department_id)
+            
+            await this.employeeRepository.update(id,existingEmployee)
         }
     }
 
@@ -71,6 +90,7 @@ class EmployeeService {
         }
         
     }
+
 }
 
 export default EmployeeService

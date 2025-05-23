@@ -37,7 +37,7 @@ class EmployeeRepository {
     }
 
     async update(id:number, employee:Employee):Promise<void> {
-        await this.repository.save({id, ...employee});
+        await this.repository.save(employee);
     }
 
     async delete(id:number): Promise<void> {
@@ -47,7 +47,6 @@ class EmployeeRepository {
     async remove(employee:Employee): Promise<void> {
         await this.repository.remove(employee)
     }
-
 
 }
 
