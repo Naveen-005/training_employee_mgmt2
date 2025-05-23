@@ -16,7 +16,7 @@ class DepartmentService {
     async getDepartmentByID(id:number): Promise<Department> {
         let department= await this.departmentRepository.findOneById(id)
         if(!department){
-            throw new HttpException(401,"Employee not found");
+            throw new HttpException(401,"Department not found");
         }
         return department;
     }
@@ -26,9 +26,26 @@ class DepartmentService {
         newDepartment.name=department.name
         newDepartment.employees=await this.employeeRepository.findManyById(department.employees)
 
-
-
         return await this.departmentRepository.create(newDepartment)
+    }
+
+    async updateDepartment(id:number,updatedDetails:CreateDepartmentDto): Promise<void> {
+
+        const department=await this.departmentRepository.findOneById(id)
+        if(department){
+            
+            if(updatedDetails.name){
+                department.name=updatedDetails.name
+            }
+            if(updatedDetails.employees){
+                const newEmployees =await this.employeeRepository.findManyById(updatedDetails.employees)
+                //console.log(newEmployees)
+                department.employees = [...department.employees, ...newEmployees]
+            }
+          
+        }
+
+        await this.departmentRepository.update(department)
     }
 
     async deleteDepartment(id:number): Promise<void> {
@@ -36,6 +53,8 @@ class DepartmentService {
         const existingDepartment = await this.departmentRepository.findOneById(id)
         if(existingDepartment){
             await this.departmentRepository.remove(existingDepartment)
+        }else{
+            throw new HttpException(402,"Department does not exist")
         }
         
     }

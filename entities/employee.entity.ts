@@ -47,7 +47,9 @@ class Employee extends AbstractEntity {
     })
     address: Address
 
-    @ManyToOne(() => Department, (department) => department.employees)
+    @ManyToOne(() => Department, (department) => department.employees,{
+      onDelete:'CASCADE'
+    })
     department:Department
 
     @Column()

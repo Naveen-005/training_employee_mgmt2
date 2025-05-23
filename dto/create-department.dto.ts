@@ -6,5 +6,6 @@ export class CreateDepartmentDto {
   @IsString()
   name: string;
 
+  @IsNumber({},{each: true})
   employees: number[];
 }
