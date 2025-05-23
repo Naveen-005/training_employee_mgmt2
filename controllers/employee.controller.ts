@@ -5,15 +5,16 @@ import { CreateEmployeeDto } from "../dto/create-employee.dto";
 import { plainToInstance, } from "class-transformer";
 import { validate } from "class-validator";
 import { UpdateEmployeeDto } from "../dto/update-employee.dto";
-import { authorizationMiddleware } from "../middlewares/authorizationMiddleware";
+import { checkRole } from "../middlewares/authorizationMiddleware";
+import { EmployeeRole } from "../entities/employee.entity";
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
-        router.post("/",authorizationMiddleware,this.createEmployee.bind(this));
+        router.post("/",checkRole([EmployeeRole.HR,EmployeeRole.DEVELOPER]),this.createEmployee.bind(this));
         router.get("/:id",this.getEmployeeById.bind(this));
         router.get("/",this.getAllEmployees.bind(this));
-        router.put("/:id",authorizationMiddleware,this.updateEmployee);
-        router.delete("/:id",authorizationMiddleware,this.deleteEmployee);
+        router.put("/:id",checkRole([]),this.updateEmployee);
+        router.delete("/:id",checkRole([]),this.deleteEmployee);
     }
 
     async createEmployee(req:Request, res: Response, next:NextFunction){
