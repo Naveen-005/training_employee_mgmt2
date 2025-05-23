@@ -3,10 +3,14 @@ import Employee, { EmployeeRole } from '../entities/employee.entity';
 import Address from '../entities/address.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import bcrypt from 'bcrypt'
+import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import DepartmentRepository from '../repositories/department.repository';
 
 class EmployeeService {
 
-    constructor(private employeeRepository: EmployeeRepository){}
+    constructor(private employeeRepository: EmployeeRepository,
+        private departmentRepository: DepartmentRepository
+    ){}
 
     async getAllEmployees(): Promise<Employee[]> {
 
@@ -25,16 +29,24 @@ class EmployeeService {
         return this.employeeRepository.findByEmail(email)
     }
 
-    async createEmployee(email:string, name:string, age:number, address:CreateAddressDto, password:string,role:EmployeeRole): Promise<Employee> {
+    async createEmployee(employee: CreateEmployeeDto, address:CreateAddressDto): Promise<Employee> {
+
         const newEmployee = new Employee();
-        newEmployee.email=email
-        newEmployee.name=name
-        newEmployee.age=age
+        newEmployee.email=employee.email
+        newEmployee.name=employee.name
+        newEmployee.age=employee.age
+        newEmployee.employeeId=employee.employeeId
+        newEmployee.dateOfJoining=employee.dateOfJoining
         newEmployee.address=new Address()
         newEmployee.address.line1=address.line1,
+        newEmployee.address.line2=address.line2,
+        newEmployee.address.houseNo=address.houseNo,
         newEmployee.address.pincode=address.pincode
-        newEmployee.password= await bcrypt.hash(password,10)
-        newEmployee.role=role
+        newEmployee.password= await bcrypt.hash(employee.password,10)
+        newEmployee.role=employee.role
+        newEmployee.status=employee.status
+        newEmployee.experience=employee.experience
+        newEmployee.department= await this.departmentRepository.findOneById(employee.department_id)
         
         return this.employeeRepository.create(newEmployee)
     }

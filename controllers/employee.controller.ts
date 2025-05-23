@@ -13,8 +13,8 @@ class EmployeeController {
         router.post("/",checkRole([EmployeeRole.HR,EmployeeRole.DEVELOPER]),this.createEmployee.bind(this));
         router.get("/:id",this.getEmployeeById.bind(this));
         router.get("/",this.getAllEmployees.bind(this));
-        router.put("/:id",checkRole([]),this.updateEmployee);
-        router.delete("/:id",checkRole([]),this.deleteEmployee);
+        router.put("/:id",checkRole([EmployeeRole.HR]),this.updateEmployee);
+        router.delete("/:id",checkRole([EmployeeRole.HR]),this.deleteEmployee);
     }
 
     async createEmployee(req:Request, res: Response, next:NextFunction){
@@ -27,12 +27,8 @@ class EmployeeController {
                 throw new HttpException(400, JSON.stringify(errors));
             }
             const savedEmployee = await this.employeeService.createEmployee(
-                createEmployeeDto.email,
-                createEmployeeDto.name,
-                createEmployeeDto.age,
-                createEmployeeDto.address,
-                createEmployeeDto.password,
-                createEmployeeDto.role
+                createEmployeeDto,
+                createEmployeeDto.address
             );
             res.status(201).send(savedEmployee);
         } catch (error) {
@@ -67,8 +63,8 @@ class EmployeeController {
 
         try{
             const id=Number(req.params.id)
-            const email= req.body.email
-            const name=req.body.name
+            // const email= req.body.email
+            // const name=req.body.name
 
             const updateEmployeeDto = plainToInstance(UpdateEmployeeDto, req.body);
             const errors = await validate(updateEmployeeDto,{skipMissingProperties:true});
@@ -79,9 +75,8 @@ class EmployeeController {
             }
 
 
-
             await this.employeeService.updateEmployee(id,updateEmployeeDto.email,updateEmployeeDto.name,updateEmployeeDto.age)
-            res.status(204).send();
+            res.status(201).send();
 
         }catch (error) {
             next(error);

@@ -13,6 +13,8 @@ class DepartmentController{
         private router: Router
     ){
         router.post("/",this.register.bind(this))
+        router.get("/",this.getAllDepartments.bind(this))
+        router.get("/:id",this.getDepartmentById.bind(this))
         router.put("/:id",this.updateDepartment.bind(this))
         router.delete("/:id",this.removeDepartment.bind(this))
     }
@@ -65,9 +67,28 @@ class DepartmentController{
 
             await this.departmentService.deleteDepartment(id)
 
-            res.status(201).send({"message":"department removed"})
+            res.status(204).send({"message":"department removed"})
 
         }catch(err){
+            next(err)
+        }
+    }
+
+    async getAllDepartments(req:Request, res:Response, next:Function){
+        const departments= await this.departmentService.getAllDepartments()
+        
+        res.status(200).send(departments)
+    }
+
+    async getDepartmentById(req:Request, res:Response, next:Function){
+
+        try{
+
+            const id=Number(req.params.id)
+            const department= await this.departmentService.getDepartmentByID(id)
+            res.status(200).send(department)
+
+        } catch(err){
             next(err)
         }
     }
