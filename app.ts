@@ -24,7 +24,7 @@ server.get("/", (req: Request, res: Response) => {
 });
 
 server.use("/employees",authMiddleware,employeeRouter);
-server.use("/departments",departmentRouter)
+server.use("/departments",authMiddleware,departmentRouter)
 server.use("/auth",authRouter);
 
 server.use(errorMiddleware);

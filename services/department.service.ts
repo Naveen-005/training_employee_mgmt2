@@ -16,7 +16,7 @@ class DepartmentService {
     async getDepartmentByID(id:number): Promise<Department> {
         let department= await this.departmentRepository.findOneById(id)
         if(!department){
-            throw new HttpException(401,"Department not found");
+            throw new HttpException(404,"Department not found");
         }
         return department;
     }
@@ -54,7 +54,7 @@ class DepartmentService {
         if(existingDepartment){
             await this.departmentRepository.remove(existingDepartment)
         }else{
-            throw new HttpException(402,"Department does not exist")
+            throw new HttpException(404,"Department does not exist")
         }
         
     }

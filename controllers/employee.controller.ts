@@ -7,6 +7,9 @@ import { validate } from "class-validator";
 import { UpdateEmployeeDto } from "../dto/update-employee.dto";
 import { checkRole } from "../middlewares/authorizationMiddleware";
 import { EmployeeRole } from "../entities/employee.entity";
+import { LoggerService } from "../services/logger.service";
+
+const logger = LoggerService.getInstance('EmployeeController');
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
@@ -23,13 +26,15 @@ class EmployeeController {
             const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body);
             const errors = await validate(createEmployeeDto);
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                throw new HttpException(400,"Invalid Details");
             }
             const savedEmployee = await this.employeeService.createEmployee(
                 createEmployeeDto,
                 createEmployeeDto.address
             );
+            
+            logger.info(`New employee created ${savedEmployee.id} ${savedEmployee.name} `)
+
             res.status(201).send(savedEmployee);
         } catch (error) {
             next(error);
@@ -39,7 +44,6 @@ class EmployeeController {
 
     async getAllEmployees(req:Request, res:Response){
         const employees=await this.employeeService.getAllEmployees();
-        console.log("req.user="+req.user)
         res.status(200).send(employees);
     }
 
@@ -70,13 +74,13 @@ class EmployeeController {
             const errors = await validate(updateEmployeeDto,{skipMissingProperties:true});
 
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                throw new HttpException(400,"Invalid format");
             }
 
 
             await this.employeeService.updateEmployee(id,updateEmployeeDto)
-            res.status(201).send();
+            logger.info(`Updated employee of id ${id}`)
+            res.status(200).send();
 
         }catch (error) {
             next(error);
@@ -88,7 +92,8 @@ class EmployeeController {
         const id=Number(req.params.id)
 
         await this.employeeService.deleteEmployee(id)
-        res.status(200).send();
+        logger.info(`Deleted employee of id ${id}`)
+        res.status(204).send();
     }
 
 

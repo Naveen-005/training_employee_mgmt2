@@ -1,3 +1,4 @@
+
 class HttpException extends Error {
     public status: number;
     public message: string;
@@ -6,6 +7,7 @@ class HttpException extends Error {
         super(message)
         this.status=status
         this.message=message
+        
     }
 }
 

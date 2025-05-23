@@ -6,17 +6,22 @@ import { CreateDepartmentDto } from '../dto/create-department.dto'
 import { validate } from "class-validator";
 import { plainToInstance, } from "class-transformer";
 import { UpdateDepartmentDto } from '../dto/update-department.dto'
+import { checkRole } from '../middlewares/authorizationMiddleware'
+import { EmployeeRole } from '../entities/employee.entity'
+import { LoggerService } from "../services/logger.service";
+
+const logger = LoggerService.getInstance('DepartmentController');
 
 class DepartmentController{
 
     constructor(private departmentService: DepartmentService,
         private router: Router
     ){
-        router.post("/",this.register.bind(this))
+        router.post("/",checkRole([EmployeeRole.HR]),this.register.bind(this))
         router.get("/",this.getAllDepartments.bind(this))
         router.get("/:id",this.getDepartmentById.bind(this))
-        router.put("/:id",this.updateDepartment.bind(this))
-        router.delete("/:id",this.removeDepartment.bind(this))
+        router.put("/:id",checkRole([EmployeeRole.HR]),this.updateDepartment.bind(this))
+        router.delete("/:id",checkRole([EmployeeRole.HR]),this.removeDepartment.bind(this))
     }
 
     async register(req: Request, res: Response, next: NextFunction){
@@ -27,13 +32,13 @@ class DepartmentController{
             
             const errors = await validate(createDepartmentDto);
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                //console.log(JSON.stringify(errors));
+                throw new HttpException(400, "Invalid format");
             }
 
             const newDepartment = await this.departmentService.createDepartment(createDepartmentDto)
-
-            res.status(200).send({"message":"department registered","new department":newDepartment})
+            logger.info(`New department created ${newDepartment.id} ${newDepartment.name}`)
+            res.status(201).send({"message":"department registered","new department":newDepartment})
         } catch(err){
             next(err)
         }
@@ -48,12 +53,12 @@ class DepartmentController{
             
             const errors = await validate(updateDepartmentDto);
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                //console.log(JSON.stringify(errors));
+                throw new HttpException(400, "Invalid format");
             }
 
             await this.departmentService.updateDepartment(id,updateDepartmentDto)
-
+            logger.info(`Updated details of department with id ${id}`)
             res.status(200).send({"message":"department updated"})
 
         }catch(err){
@@ -66,7 +71,7 @@ class DepartmentController{
             const id=Number(req.params.id)
 
             await this.departmentService.deleteDepartment(id)
-
+            logger.info(`Deeted department with id ${id}`)
             res.status(204).send({"message":"department removed"})
 
         }catch(err){

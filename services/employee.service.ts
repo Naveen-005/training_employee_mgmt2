@@ -22,13 +22,14 @@ class EmployeeService {
     async getEmployeeByID(id:number): Promise<Employee> {
         let employee= await this.employeeRepository.findOneById(id)
         if(!employee){
-            throw new Error("Employee not found");
+            throw new HttpException(404,"Employee not found");
         }
         return employee;
     }
 
     async getEmployeeByEmail(email:string):Promise<Employee> {
         return this.employeeRepository.findByEmail(email)
+        
     }
 
     async createEmployee(employee: CreateEmployeeDto, address:CreateAddressDto): Promise<Employee> {
