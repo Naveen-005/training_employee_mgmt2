@@ -8,7 +8,6 @@ class DepartmentRepository {
 
     async create(department: Department): Promise<Department> {
         return this.repository.save(department);
-        
     }
 
     async findMany(): Promise<Department[]>{

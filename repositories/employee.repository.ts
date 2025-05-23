@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import Employee from "../entities/employee.entity";
 
 class EmployeeRepository {
@@ -17,6 +17,10 @@ class EmployeeRepository {
                 address:true
             }
         });
+    }
+
+    async findManyById(ids:number[]): Promise<Employee[]>{
+        return this.repository.find({ where: { id: In([...ids]) } });
     }
 
     async findOneById(id: number): Promise<Employee> {

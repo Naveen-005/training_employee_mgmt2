@@ -1,14 +1,12 @@
 import DepartmentRepository from '../repositories/department.repository';
-import Employee, { EmployeeRole } from '../entities/employee.entity';
-import Address from '../entities/address.entity';
-import { CreateAddressDto } from '../dto/create-address.dto';
-import bcrypt from 'bcrypt'
 import Department from '../entities/department.entity';
 import HttpException from '../exception/httpException';
+import { CreateDepartmentDto } from '../dto/create-department.dto';
+import EmployeeRepository from '../repositories/employee.repository';
 
 class DepartmentService {
 
-    constructor(private departmentRepository: DepartmentRepository){}
+    constructor(private departmentRepository: DepartmentRepository, private employeeRepository: EmployeeRepository){}
 
     async getAllDepartments(): Promise<Department[]> {
 
@@ -21,6 +19,16 @@ class DepartmentService {
             throw new HttpException(401,"Employee not found");
         }
         return department;
+    }
+
+    async createDepartment(department:CreateDepartmentDto): Promise<Department> {
+        const newDepartment=new Department()
+        newDepartment.name=department.name
+        newDepartment.employees=await this.employeeRepository.findManyById(department.employees)
+
+
+
+        return await this.departmentRepository.create(newDepartment)
     }
 
     async deleteDepartment(id:number): Promise<void> {
