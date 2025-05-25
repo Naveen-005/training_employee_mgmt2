@@ -122,4 +122,105 @@ describe('DepartmentService',()=>{
 
         })
     })
+
+    describe('update department', () => {
+
+        it('Should update the details of a department and return a promise', async() => {
+
+            const tmpEmployeeList=[{id:1}] as Employee[]
+
+            const tmpEmployeeList2=[{id:2}] as Employee[]
+
+            const tmpEmployeeList3=[{
+                id:1
+            },{
+                id:2
+            }] as Employee[]
+
+            const tmpDepartment = {
+                "id": 1,
+                "name": "Marketing",
+                "employees": tmpEmployeeList
+                
+            }as Department
+
+            const tmpDepartment2 = {
+                "id": 1,
+                "name": "Public Relations",
+                "employees": tmpEmployeeList3
+                
+            }as Department
+
+            const updateDepartmentInput = {
+                "name": "Public Relations",
+                "employees": [2]
+            } as CreateDepartmentDto
+
+            when(MockDepartmentRepository.findOneById).calledWith(1).mockReturnValue(tmpDepartment)
+            when(MockEmployeeRepository.findManyById).calledWith(updateDepartmentInput.employees).mockReturnValue(tmpEmployeeList2)
+
+            await departmentService.updateDepartment(1,updateDepartmentInput)
+
+            expect(MockDepartmentRepository.findOneById).toHaveBeenCalledWith(1)
+            expect(MockEmployeeRepository.findManyById).toHaveBeenCalledWith(updateDepartmentInput.employees)
+            expect(MockDepartmentRepository.update).toHaveBeenCalledWith(tmpDepartment2)
+
+        })
+
+        it('shoud throw error when id is invalid', async() => {
+
+            const tmpDepartment = {
+                "name": "Public Relations",
+                "employees": [1,2]
+            } as CreateDepartmentDto
+
+            const tmpEmployeeList=[{
+
+                id:1
+            }, {
+
+                id:2
+            }] as Employee[]
+
+
+            when(MockDepartmentRepository.findOneById).calledWith(2).mockReturnValue(null)
+
+            expect(departmentService.updateDepartment(2,tmpDepartment)).rejects.toThrow("Department does not exist")
+            expect(MockDepartmentRepository.findOneById).toHaveBeenCalledWith(2)
+        })
+
+    })
+
+    describe('delete department', () => {
+
+        it('Delete department if id is valid', async() => {
+
+            const tmpDepartment = {
+                "name": "Public Relations",
+                "employees": [1,2]
+            } as CreateDepartmentDto
+
+            const tmpEmployeeList=[{
+
+                id:1
+            }, {
+
+                id:2
+            }] as Employee[]
+
+            when(MockDepartmentRepository.findOneById).calledWith(1).mockReturnValue(tmpDepartment)
+
+            await departmentService.deleteDepartment(1)
+
+            expect(MockDepartmentRepository.remove).toHaveBeenCalledWith(tmpDepartment)
+        })
+
+        it('throw error if is invalid', async () => {
+
+            when(MockDepartmentRepository.findOneById).calledWith(2).mockReturnValue(null)
+
+            expect(departmentService.deleteDepartment(2)).rejects.toThrow("Department does not exist")
+            expect(MockDepartmentRepository.findOneById).toHaveBeenCalledWith(2)
+        })
+    })
 })
