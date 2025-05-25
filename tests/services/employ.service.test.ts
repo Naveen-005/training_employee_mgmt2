@@ -3,15 +3,18 @@ import {when} from 'jest-when'
 import EmployeeRepository from '../../repositories/employee.repository'
 import EmployeeService from '../../services/employee.service'
 import Employee from '../../entities/employee.entity'
+import DepartmentRepository from '../../repositories/department.repository'
 
 describe('EmployeeService',() => {
 
     let employeeRepositoryMock:MockProxy<EmployeeRepository>
+    let departmentRepositoryMock:MockProxy<DepartmentRepository>
     let employeeService:EmployeeService
 
     beforeEach(()=>{
         employeeRepositoryMock=mock<EmployeeRepository>();
-        employeeService=new EmployeeService(employeeRepositoryMock)
+        departmentRepositoryMock=mock<DepartmentRepository>();
+        employeeService=new EmployeeService(employeeRepositoryMock,departmentRepositoryMock)
     })
 
     describe('getEmployeeById', ()=>{
