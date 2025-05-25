@@ -43,6 +43,9 @@ class DepartmentService {
                 department.employees = [...department.employees, ...newEmployees]
             }
           
+        }else{
+            
+            throw new HttpException(404,"Department does not exist")
         }
 
         await this.departmentRepository.update(department)
