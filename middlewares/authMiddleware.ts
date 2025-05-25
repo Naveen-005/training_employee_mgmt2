@@ -18,7 +18,6 @@ export const authMiddleware=(req:Request, res:Response, next:NextFunction)=>{
         throw new HttpException(401,"Invalid or expired token")
     }
     
-    next()
 }
 
 const getToken = (req:Request):string =>{
