@@ -1,12 +1,11 @@
-import { IsNotEmpty, IsString} from "class-validator";
+import { IsNotEmpty, IsString, IsNumber} from "class-validator";
+import Employee from "../entities/employee.entity";
 
-export class CreateEmployeeDto {
+export class CreateDepartmentDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNumber({},{each: true})
   employees: number[];
-
 }

@@ -8,7 +8,6 @@ class DepartmentRepository {
 
     async create(department: Department): Promise<Department> {
         return this.repository.save(department);
-        
     }
 
     async findMany(): Promise<Department[]>{
@@ -28,8 +27,8 @@ class DepartmentRepository {
         });
     }
 
-    async update(id:number, Department:Department):Promise<void> {
-        await this.repository.save({id, ...Department});
+    async update(department:Department):Promise<void> {
+        await this.repository.save(department);
     }
 
     async delete(id:number): Promise<void> {

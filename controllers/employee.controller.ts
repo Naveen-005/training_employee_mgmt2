@@ -1,20 +1,23 @@
 import HttpException from "../exception/httpException";
 import EmployeeService from "../services/employee.service";
 import {Request, Response, Router, NextFunction} from "express";
-import { isEmail } from "../validators/emailValidator";
 import { CreateEmployeeDto } from "../dto/create-employee.dto";
-import { CreateAddressDto } from "../dto/create-address.dto";
 import { plainToInstance, } from "class-transformer";
 import { validate } from "class-validator";
 import { UpdateEmployeeDto } from "../dto/update-employee.dto";
+import { checkRole } from "../middlewares/authorizationMiddleware";
+import { EmployeeRole } from "../entities/employee.entity";
+import { LoggerService } from "../services/logger.service";
+
+const logger = LoggerService.getInstance('EmployeeController');
 
 class EmployeeController {
     constructor(private employeeService: EmployeeService, router:Router){
-        router.post("/",this.createEmployee.bind(this));
+        router.post("/",checkRole([EmployeeRole.HR,EmployeeRole.DEVELOPER]),this.createEmployee.bind(this));
         router.get("/:id",this.getEmployeeById.bind(this));
         router.get("/",this.getAllEmployees.bind(this));
-        router.put("/:id",this.updateEmployee);
-        router.delete("/:id",this.deleteEmployee);
+        router.put("/:id",checkRole([EmployeeRole.HR]),this.updateEmployee);
+        router.delete("/:id",checkRole([EmployeeRole.HR]),this.deleteEmployee);
     }
 
     async createEmployee(req:Request, res: Response, next:NextFunction){
@@ -23,15 +26,15 @@ class EmployeeController {
             const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body);
             const errors = await validate(createEmployeeDto);
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                throw new HttpException(400,"Invalid Details");
             }
             const savedEmployee = await this.employeeService.createEmployee(
-                createEmployeeDto.email,
-                createEmployeeDto.name,
-                createEmployeeDto.age,
+                createEmployeeDto,
                 createEmployeeDto.address
             );
+            
+            logger.info(`New employee created ${savedEmployee.id} ${savedEmployee.name} `)
+
             res.status(201).send(savedEmployee);
         } catch (error) {
             next(error);
@@ -64,21 +67,20 @@ class EmployeeController {
 
         try{
             const id=Number(req.params.id)
-            const email= req.body.email
-            const name=req.body.name
+            // const email= req.body.email
+            // const name=req.body.name
 
             const updateEmployeeDto = plainToInstance(UpdateEmployeeDto, req.body);
             const errors = await validate(updateEmployeeDto,{skipMissingProperties:true});
 
             if (errors.length > 0) {
-                console.log(JSON.stringify(errors));
-                throw new HttpException(400, JSON.stringify(errors));
+                throw new HttpException(400,"Invalid format");
             }
 
 
-
-            await this.employeeService.updateEmployee(id,updateEmployeeDto.email,updateEmployeeDto.name,updateEmployeeDto.age)
-            res.status(204).send();
+            await this.employeeService.updateEmployee(id,updateEmployeeDto)
+            logger.info(`Updated employee of id ${id}`)
+            res.status(200).send();
 
         }catch (error) {
             next(error);
@@ -90,7 +92,8 @@ class EmployeeController {
         const id=Number(req.params.id)
 
         await this.employeeService.deleteEmployee(id)
-        res.status(200).send();
+        logger.info(`Deleted employee of id ${id}`)
+        res.status(204).send();
     }
 
 

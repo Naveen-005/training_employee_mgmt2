@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import Employee from "../entities/employee.entity";
 
 class EmployeeRepository {
@@ -19,6 +19,10 @@ class EmployeeRepository {
         });
     }
 
+    async findManyById(ids:number[]): Promise<Employee[]>{
+        return this.repository.find({ where: { id: In([...ids]) } });
+    }
+
     async findOneById(id: number): Promise<Employee> {
         return this.repository.findOne({
             where:{id},
@@ -28,8 +32,12 @@ class EmployeeRepository {
         });
     }
 
+    async findByEmail(email:string): Promise<Employee | null> {
+        return this.repository.findOneBy({email});
+    }
+
     async update(id:number, employee:Employee):Promise<void> {
-        await this.repository.save({id, ...employee});
+        await this.repository.save(employee);
     }
 
     async delete(id:number): Promise<void> {
@@ -39,7 +47,6 @@ class EmployeeRepository {
     async remove(employee:Employee): Promise<void> {
         await this.repository.remove(employee)
     }
-
 
 }
 
