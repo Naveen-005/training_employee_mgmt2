@@ -67,12 +67,11 @@ class EmployeeService {
             existingEmployee.employeeId= updatedEmployee.employeeId
             existingEmployee.name= updatedEmployee.name
             existingEmployee.age= updatedEmployee.age
-            existingEmployee.password= await bcrypt.hash(updatedEmployee.password,10)
             existingEmployee.role= updatedEmployee.role
             existingEmployee.dateOfJoining = updatedEmployee.dateOfJoining
             existingEmployee.experience = updatedEmployee.experience
             existingEmployee.status = updatedEmployee.status
-
+            existingEmployee.password = existingEmployee.password
             existingEmployee.address.line1=updatedEmployee.address.line1
             existingEmployee.address.line2=updatedEmployee.address.line2
             existingEmployee.address.houseNo=updatedEmployee.address.houseNo
